@@ -1,39 +1,65 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+This package is opinionated solution for state management.
+It's a thin wrapper around `ChangeNotifier`, which allows to write controllers/state manamagement without burden of codegen and copyWith methods. Don't forget to `.flush()`!
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Here's an example of a simple counter.
 
 ```dart
-const like = 'sample';
+import 'package:flutter/material.dart';
+import 'package:jos/jos.dart';
+
+class CounterJos extends Jos {
+  int count = 0; // That's the state!
+
+  void inc() {
+    this
+      ..count += 1
+      ..flush(); // Flush notifies all listeners
+  }
+}
+
+class CounterPage extends StatefulWidget {
+  const CounterPage({super.key});
+  @override
+  State createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  final jos = CounterJos();
+
+  @override
+  void dispose() {
+    jos.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        JosBuilder( // Thin wrapper around listenable builder
+          jos: jos,
+          builder: (context, jos) { // This is the same jos as outer in the argument
+            return Text("Count: ${jos.count}");
+          },
+        ),
+        ElevatedButton(
+          onPressed: jos.inc, // Just call the function!
+          child: Text("inc"),
+        ),
+      ],
+    );
+  }
+}
 ```
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+Questions:
+
+> Is it any good? 
+
+Yes.
