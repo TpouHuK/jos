@@ -18,7 +18,6 @@ class JosSelector<T extends ChangeNotifier, F> extends StatefulWidget {
 
 class _JosSelectorState<T extends ChangeNotifier, F>
     extends State<JosSelector<T, F>> {
-
   @override
   void initState() {
     super.initState();
@@ -33,7 +32,10 @@ class _JosSelectorState<T extends ChangeNotifier, F>
     if (oldWidget.jos != widget.jos) {
       oldWidget.jos.removeListener(_onUpdate);
       widget.jos.addListener(_onUpdate);
-      _onUpdate();
+      final newState = widget.selector(widget.jos);
+      if (newState != _state) {
+        _state = newState;
+      }
     }
   }
 

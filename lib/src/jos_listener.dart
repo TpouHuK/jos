@@ -35,10 +35,6 @@ class _JosListenerState<T extends ChangeNotifier, F>
       _onUpdate();
     }
 
-    if (oldWidget.child != widget.child) {
-      setState(() {});
-    }
-
     super.didUpdateWidget(oldWidget);
   }
 
