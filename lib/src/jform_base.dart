@@ -80,20 +80,34 @@ abstract class JFormFieldImpl<T, E extends JFormError> extends Jos
   @override
   E? get displayError => isDirty ? error : null;
 
+  (T, bool)? Function(T, bool isDirty) preSet = (s, bool isDirty) {
+    return (s, isDirty);
+  };
+
   @override
   void forceSet(T value, bool isDirty) {
-    this
-      .._value = value
-      ..isDirty = isDirty
-      ..flush();
+    final preSetResult = preSet(value, isDirty);
+
+    if (preSetResult != null) {
+      final (newValue, newDirty) = preSetResult;
+      this
+        .._value = newValue
+        ..isDirty = newDirty
+        ..flush();
+    }
   }
 
   @override
   void setValue(T value) {
-    this
-      .._value = value
-      ..isDirty = true
-      ..flush();
+    final preSetResult = preSet(value, true);
+
+    if (preSetResult != null) {
+      final (newValue, newDirty) = preSetResult;
+      this
+        .._value = newValue
+        ..isDirty = newDirty
+        ..flush();
+    }
   }
 
   @override
