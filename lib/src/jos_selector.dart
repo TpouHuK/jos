@@ -5,12 +5,14 @@ class JosSelector<T extends ChangeNotifier, F> extends StatefulWidget {
     super.key,
     required this.jos,
     required this.selector,
+    this.eq,
     required this.builder,
   });
 
   final T jos;
   final F Function(T jos) selector;
-  final Function(BuildContext context, F value) builder;
+  final bool Function(F, F)? eq;
+  final Widget Function(BuildContext context, F value) builder;
 
   @override
   State createState() => _JosSelectorState<T, F>();
@@ -33,7 +35,7 @@ class _JosSelectorState<T extends ChangeNotifier, F>
       oldWidget.jos.removeListener(_onUpdate);
       widget.jos.addListener(_onUpdate);
       final newState = widget.selector(widget.jos);
-      if (newState != _state) {
+      if (!cmpState(_state, newState)) {
         _state = newState;
       }
     }
@@ -41,10 +43,19 @@ class _JosSelectorState<T extends ChangeNotifier, F>
 
   void _onUpdate() {
     final newState = widget.selector(widget.jos);
-    if (newState != _state) {
+    if (!cmpState(_state, newState)) {
       setState(() {
         _state = newState;
       });
+    }
+  }
+
+  bool cmpState(F old, F current) {
+    final eq = widget.eq;
+    if (eq == null) {
+      return old == current;
+    } else {
+      return eq(old, current);
     }
   }
 
